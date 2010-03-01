@@ -1,0 +1,33 @@
+<html>
+  <head></head>
+
+  <body>
+    <script type="text/javascript" src="http://lib.chewam.net/ext-core/ext-core-debug.js"></script>
+    <script type="text/javascript" src="../Ext.ux.Carousel.js"></script>
+    <script>
+Ext.onReady(function() {
+
+  var carousel = new Ext.ux.CarouselPanel({
+    enableLoop:true
+    ,itemSize:{
+      width:400
+      ,height:200
+    }
+    ,items:[
+      {html:"item 1", image:"http://www.soreia.com/images/developpement-soreia.png"},
+      {html:"item 2", image:"http://amazingdata.com/mediadata57/Image/crazy_funny_amazing_shocking_awesome_sexy_200907311355002837.jpg"},
+      {html:"item 3", image:"http://1.bp.blogspot.com/_Bf6UzKbHR7c/SAAQxLa6RwI/AAAAAAAAA5w/EXuyb71tUg8/s400/lolcats-funny-pictures-angermanagement.jpg"}
+    ]
+    ,buttons:[
+      {image:"http://icons3.iconfinder.netdna-cdn.com/data/icons/glaze/64x64/actions/previous.png"}
+      ,{image:"http://icons3.iconfinder.netdna-cdn.com/data/icons/glaze/64x64/actions/next.png"}
+    ]
+  });
+
+  carousel.render();
+
+});
+    </script>
+  </body>
+
+</html>
