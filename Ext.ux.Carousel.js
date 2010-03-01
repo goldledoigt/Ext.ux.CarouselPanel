@@ -4,8 +4,8 @@
 ** Made by goldledoigt
 ** Contact <goldledoigt@chewam.com>
 **
-** Started on  Mon Mar  1 10:46:08 2010
-** Last update Mon Mar  1 17:11:46 2010 Gary van Woerkens
+** Started on  Mon Mar  1 10:46:08 2010 goldledoigt
+** Last update Mon Mar  1 21:30:35 2010 goldledoigt
 **
 ** DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
 ** Version 2, December 2004
@@ -27,20 +27,22 @@ Ext.ux.Carousel = Ext.extend(Ext.util.Observable, {
 
   constructor:function(config) {
     Ext.apply(this, config || {});
+    this.totalViews = Math.floor((this.items.length - 1) / this.itemsPerView);
     Ext.ux.Carousel.superclass.constructor.apply(this, arguments);
   },
 
   render:function(el) {
-    var carousel = Ext.DomHelper.append(el, {
+
+    this.el = Ext.DomHelper.append(el, {
       id:"carousel"
       ,tag:"div"
-	,style:"width:"+(this.itemSize.width * this.itemsPerView + (this.itemSidesMargin * this.itemsPerView * 2))+"px;"
+      ,style:"width:"+(this.itemSize.width * this.itemsPerView + (this.itemSidesMargin * this.itemsPerView * 2))+"px;"
 	+ "height:"+this.itemSize.height+"px;"
 	+ "overflow:hidden;"
 	+ "float:left;"
     });
 
-    this.viewEl = Ext.DomHelper.append(carousel, {
+    this.viewEl = Ext.DomHelper.append(this.el, {
       id:"carousel-view",
       tag:"div",
       style:"width:"+(this.itemSize.width * this.items.length + (this.itemSidesMargin * this.items.length * 2))+"px;"
@@ -69,30 +71,31 @@ Ext.ux.Carousel = Ext.extend(Ext.util.Observable, {
   }
 
   ,move:function(direction) {
-    var el = Ext.fly(this.viewEl);
-    var xy = el.getXY();
-    var dir = (direction == "left") ? 1 : -1;
-    var itemSidesMargin = this.itemsPerView * this.itemSidesMargin * 2;
-    var dist = xy[0] + ((itemSidesMargin + this.itemSize.width * this.itemsPerView) * dir);
-    if (!this.startPos) this.startPos = xy[0];
-    if (!this.stopPos)
-      this.stopPos = this.startPos - (itemSidesMargin + this.itemSize.width * (this.items.length - 1));
-    if (this.enableLoop) {
-      if (dist > this.startPos) dist = this.stopPos;
-      else if (dist < this.stopPos) dist = this.startPos;
+    var xy = Ext.fly(this.el).getXY();
+    if (!this.viewIndex) this.viewIndex = 0;
+    if (direction == "right") {
+      if (this.viewIndex == this.totalViews) {
+	if (this.enableLoop || this.autoLoop) this.viewIndex = 0;
+      } else this.viewIndex++;
+    } else if (direction == "left") {
+      if (this.viewIndex == 0) {
+	if (this.enableLoop || this.autoLoop) this.viewIndex = this.totalViews;
+      } else this.viewIndex--;
     }
-    if (dist <= this.startPos && dist >= this.stopPos)
-      Ext.fly(this.viewEl).moveTo(dist, xy[1], {
-	duration:1
-	,easing:"easeIn"
-	,scope:this
-	,direction:direction
-	,callback:this.moveCallback
-      });
+    var viewSize = this.itemSize.width * this.itemsPerView * this.viewIndex;
+    var viewMargin = this.itemSidesMargin * this.itemsPerView * 2 * this.viewIndex;
+    var pos = xy[0] - viewSize - viewMargin;
+    Ext.fly(this.viewEl).moveTo(pos, xy[1], {
+      duration:1
+      ,easing:"easeIn"
+      ,scope:this
+      ,direction:direction
+      ,callback:this.moveCallback
+    });
   }
 
   ,moveCallback:function(el, options) {
-    this.fireEvent("move", this, options.direction);
+    this.fireEvent("move", options.direction);
   }
 
 });
@@ -107,30 +110,28 @@ Ext.ux.CarouselPanel = Ext.extend(Ext.util.Observable, {
   ,items:[]
   ,buttons:[]
   ,enableLoop:false
+  ,autoLoop:false
+  ,enableButtons:true
 
   ,constructor:function(config) {
     Ext.apply(this, config);
     Ext.ux.CarouselPanel.superclass.constructor.apply(this, arguments);
+    this.on({render:this.onRender});
   },
 
   render:function(el) {
+
+    var buttonsWidth = (this.enableButtons) ? this.buttons[0].width + this.buttons[1].width : 0;
+
     this.el = Ext.DomHelper.append(el || Ext.getBody(), {
-      id:"carousel-panel",
-      tag:"div",
-      style:"height:"+this.itemSize.height+"px;overflow:hidden;"
+      id:"carousel-panel"
+      ,tag:"div"
+      ,style:"width:"+(buttonsWidth + this.itemSize.width * this.itemsPerView + (this.itemSidesMargin * this.itemsPerView * 2))+"px;"
+	+ "height:"+this.itemSize.height+"px;"
+	+ "overflow:hidden;"
+	+ "margin:0 auto;"
     });
 
-    var tpl = new Ext.Template(
-      '<div style="width:70px;height:'+this.itemSize.height+'px;'
-	+ 'float:left;'
-	+ 'background-position:0 50%;'
-	+ 'cursor:pointer;'
-	+ 'background-repeat:no-repeat;'
-	+ 'background-image:url({image});">'
-	+ '</div>'
-    );
-
-    this.leftButton = tpl.append(this.el, this.buttons[0]);
     this.carousel = new Ext.ux.Carousel({
       enableLoop:this.enableLoop
       ,items:this.items
@@ -139,7 +140,21 @@ Ext.ux.CarouselPanel = Ext.extend(Ext.util.Observable, {
       ,itemSidesMargin:this.itemSidesMargin
     });
     this.carousel.render(this.el);
-    this.rightButton = tpl.append(this.el, this.buttons[1]);
+
+    if (this.enableButtons) {
+      var tpl = new Ext.Template(
+	'<div style="width:{width}px;height:'+this.itemSize.height+'px;'
+	  + 'float:left;'
+	  + 'background-position:0 50%;'
+	  + 'cursor:pointer;'
+	  + 'background-repeat:no-repeat;'
+	  + 'background-image:url({image});">'
+	  + '</div>'
+      );
+      this.leftButton = tpl.insertFirst(this.el, this.buttons[0]);
+      this.rightButton = tpl.append(this.el, this.buttons[1]);
+      this.setButtonsEvents();
+    }
 
     Ext.DomHelper.append(this.el, {
       id:"carousel-clear",
@@ -147,11 +162,24 @@ Ext.ux.CarouselPanel = Ext.extend(Ext.util.Observable, {
       style:"clear:both;"
     });
 
-    this.setButtonsEvents();
-
     this.carousel.on({scope:this, move:this.onMove});
 
     this.fireEvent("render", this);
+  }
+
+  ,onRender:function() {
+    if (this.autoLoop) {
+      this.loop = Ext.TaskMgr.start.defer(5000, this, [{
+	run:this.carousel.move
+	,args:["right"]
+	,scope:this.carousel
+	,interval:10000
+      }]);
+    }
+  }
+
+  ,onResize:function(e, el, options) {
+    console.log("resize", e, el, options);
   }
 
   ,buttonClick:function(e, el, options, direction) {
@@ -160,23 +188,26 @@ Ext.ux.CarouselPanel = Ext.extend(Ext.util.Observable, {
     }
   }
 
-  ,setButtonsEvents:function() {
-    Ext.fly(this.leftButton).on(
-      "click"
-      ,this.buttonClick.createDelegate(this, ["left"], true)
-      ,this
-      ,{single:true}
-    );
-    Ext.fly(this.rightButton).on(
-      "click"
-      ,this.buttonClick.createDelegate(this, ["right"], true)
-      ,this
-      ,{single:true}
-    );
+  ,setButtonsEvents:function(direction) {
+    if (!direction || direction == "left")
+      Ext.fly(this.leftButton).on(
+	"click"
+	,this.buttonClick.createDelegate(this, ["left"], true)
+	,this
+	,{single:true}
+      );
+    if(!direction || direction == "right")
+      Ext.fly(this.rightButton).on(
+	"click"
+	,this.buttonClick.createDelegate(this, ["right"], true)
+	,this
+	,{single:true}
+      );
   }
 
   ,onMove:function(direction) {
-    this.setButtonsEvents();
+    if (this.enableButtons) this.setButtonsEvents(direction);
     this.fireEvent("move", direction);
   }
+
 });
