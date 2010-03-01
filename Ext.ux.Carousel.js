@@ -5,7 +5,7 @@
 ** Contact <goldledoigt@chewam.com>
 **
 ** Started on  Mon Mar  1 10:46:08 2010 goldledoigt
-** Last update Mon Mar  1 21:30:35 2010 goldledoigt
+** Last update Mon Mar  1 21:56:22 2010 
 **
 ** DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
 ** Version 2, December 2004
@@ -75,11 +75,11 @@ Ext.ux.Carousel = Ext.extend(Ext.util.Observable, {
     if (!this.viewIndex) this.viewIndex = 0;
     if (direction == "right") {
       if (this.viewIndex == this.totalViews) {
-	if (this.enableLoop || this.autoLoop) this.viewIndex = 0;
+	if (this.enableLoop || this.enableSlideShow) this.viewIndex = 0;
       } else this.viewIndex++;
     } else if (direction == "left") {
       if (this.viewIndex == 0) {
-	if (this.enableLoop || this.autoLoop) this.viewIndex = this.totalViews;
+	if (this.enableLoop || this.enableSlideShow) this.viewIndex = this.totalViews;
       } else this.viewIndex--;
     }
     var viewSize = this.itemSize.width * this.itemsPerView * this.viewIndex;
@@ -110,8 +110,11 @@ Ext.ux.CarouselPanel = Ext.extend(Ext.util.Observable, {
   ,items:[]
   ,buttons:[]
   ,enableLoop:false
-  ,autoLoop:false
+  ,enableSlideShow:false
+  ,deferSlideShow:5000
   ,enableButtons:true
+  ,itemsPerView:1
+  ,itemSidesMargin:0
 
   ,constructor:function(config) {
     Ext.apply(this, config);
@@ -133,7 +136,7 @@ Ext.ux.CarouselPanel = Ext.extend(Ext.util.Observable, {
     });
 
     this.carousel = new Ext.ux.Carousel({
-      enableLoop:this.enableLoop
+      enableLoop:this.enableSlideShow || this.enableLoop
       ,items:this.items
       ,itemsPerView:this.itemsPerView
       ,itemSize:this.itemSize
@@ -168,12 +171,12 @@ Ext.ux.CarouselPanel = Ext.extend(Ext.util.Observable, {
   }
 
   ,onRender:function() {
-    if (this.autoLoop) {
-      this.loop = Ext.TaskMgr.start.defer(5000, this, [{
+    if (this.enableSlideShow) {
+      this.loop = Ext.TaskMgr.start.defer(this.deferSlideShow, this, [{
 	run:this.carousel.move
 	,args:["right"]
 	,scope:this.carousel
-	,interval:10000
+	,interval:this.enableSlideShow || 10000
       }]);
     }
   }
