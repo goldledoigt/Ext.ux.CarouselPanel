@@ -5,7 +5,7 @@
 ** Contact <goldledoigt@chewam.com>
 **
 ** Started on  Mon Mar  1 10:46:08 2010 goldledoigt
-** Last update Mon Mar  1 21:56:22 2010 
+** Last update Tue Mar  2 01:08:33 2010 
 **
 ** DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
 ** Version 2, December 2004
@@ -53,13 +53,15 @@ Ext.ux.Carousel = Ext.extend(Ext.util.Observable, {
     var tpl = new Ext.Template(
       '<div style="'
       + 'width:'+this.itemSize.width+'px;'
-      + 'height:'+this.itemSize.height+'px;'
       + 'margin:0 '+this.itemSidesMargin+'px;'
-      + 'float:left;'
+      + 'float:left;">'
+      + '<div style="'
+      + 'height:'+(this.itemSize.height - 20)+'px;'
       + 'background-image:url({image});'
       + 'background-position:center;'
-      + 'background-repeat:no-repeat">'
-      + '{html}'
+      + 'background-repeat:no-repeat;">'
+      + '</div>'
+      + '<div style="text-align:center;">{html}</div>'
       + '</div>'
     );
 
@@ -130,7 +132,6 @@ Ext.ux.CarouselPanel = Ext.extend(Ext.util.Observable, {
       id:"carousel-panel"
       ,tag:"div"
       ,style:"width:"+(buttonsWidth + this.itemSize.width * this.itemsPerView + (this.itemSidesMargin * this.itemsPerView * 2))+"px;"
-	+ "height:"+this.itemSize.height+"px;"
 	+ "overflow:hidden;"
 	+ "margin:0 auto;"
     });

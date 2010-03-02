@@ -8,7 +8,11 @@
 Ext.onReady(function() {
 
   new Ext.ux.CarouselPanel({
-    itemSize:{
+    enableLoop:true
+    ,enableSlideShow:5000
+    ,enableButtons:true 
+    ,deferSlideShow:5000
+    ,itemSize:{
       width:400
       ,height:200
     }
