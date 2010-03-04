@@ -5,7 +5,7 @@
 ** Contact <goldledoigt@chewam.com>
 **
 ** Started on  Mon Mar  1 10:46:08 2010 goldledoigt
-** Last update Tue Mar  2 01:08:33 2010 
+** Last update Thu Mar  4 13:15:59 2010 
 **
 ** DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
 ** Version 2, December 2004
@@ -40,6 +40,7 @@ Ext.ux.Carousel = Ext.extend(Ext.util.Observable, {
 	+ "height:"+this.itemSize.height+"px;"
 	+ "overflow:hidden;"
 	+ "float:left;"
+	+ "position:relative;"
     });
 
     this.viewEl = Ext.DomHelper.append(this.el, {
