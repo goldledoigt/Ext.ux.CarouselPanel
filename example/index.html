@@ -4,6 +4,7 @@
   <body>
     <script type="text/javascript" src="http://lib.chewam.net/ext-core/ext-core-debug.js"></script>
     <script type="text/javascript" src="../Ext.ux.Carousel.js"></script>
+    <script type="text/javascript" src="../Ext.ux.CarouselPanel.js"></script>
     <script>
 Ext.onReady(function() {
 
@@ -28,8 +29,7 @@ Ext.onReady(function() {
   }).render();
 
   new Ext.ux.CarouselPanel({
-    enableLoop:true
-    ,itemSize:{
+    itemSize:{
       width:400
       ,height:200
     }
@@ -46,6 +46,7 @@ Ext.onReady(function() {
 
   new Ext.ux.CarouselPanel({
     enableLoop:true
+    ,hideLabels:true
     ,enableSlideShow:2000
     ,enableButtons:false 
     ,deferSlideShow:2000
